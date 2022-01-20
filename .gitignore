@@ -1,2 +1,4 @@
-/cyCrypto/
-/cyPyWinUSB/
+/cyCrypto/*
+/cyPyWinUSB/*
+
+/logs/*

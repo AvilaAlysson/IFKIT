@@ -138,7 +138,7 @@ class EEG_insight(object):
         if ".log" not in filename:
             filename += ".log"
 
-        with open(filename, "w") as f:
+        with open("/logs/" + filename, "w") as f:
 
             f.write("AF3; T7; Pz; T8; AF4; Tempo\n")
 
@@ -163,7 +163,7 @@ init = True
 while 1:
 
     if init == True:
-        cyHeadset.tela = Tela()
+        cyHeadset.tela = Tela(filename= cyHeadset.filename)
         data_thread.start()
         cyHeadset.tela.execute()
         init = False

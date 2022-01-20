@@ -6,7 +6,8 @@ import sys
 
 
 class Tela(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filename, *args, **kwargs):
+        
 
         self.app = QtGui.QApplication(sys.argv)
         super(QtWidgets.QMainWindow, self).__init__(*args, **kwargs)
@@ -14,7 +15,9 @@ class Tela(QtWidgets.QMainWindow):
         self.opc = int(input("[1]- Deseja plotar em tempo real \n[2] - Deseja somente ler os dados do arquivo\nOpção: "))
 
         self.range = 1280
-
+        
+        self.filename = filename
+        
         self.area = DockArea()
         self.dock_AF3 = Dock("AF3")
         self.dock_T7 = Dock("T7")
@@ -53,39 +56,45 @@ class Tela(QtWidgets.QMainWindow):
             self.read_file()
 
         self.linha_AF3 = self.widget_AF3.plot(y=self.canalAF3, pen=self.penAF3)
-        "self.widget_AF3.setYRange(min(self.canalAF3) - 100, max(self.canalAF3) + 100, padding=0.5)"
         self.widget_AF3.plotItem.showGrid(y=True)
         self.widget_AF3.setBackground('w')
         self.widget_AF3.setMouseEnabled(x=False, y=True)
         self.dock_AF3.addWidget(self.widget_AF3)
 
         self.linha_T7 = self.widget_T7.plot(y=self.canalT7, pen=self.penT7)
-        "self.widget_T7.setYRange(min(self.canalT7) - 100, max(self.canalT7) + 100, padding=0.5)"
+        
         self.widget_T7.plotItem.showGrid(y=True)
         self.widget_T7.setBackground('w')
         self.widget_T7.setMouseEnabled(x=False)
         self.dock_T7.addWidget(self.widget_T7)
 
         self.linha_Pz = self.widget_Pz.plot(y=self.canalPz, pen=self.penPz)
-        "self.widget_Pz.setYRange(min(self.canalPz) - 100, max(self.canalPz) + 100, padding=0.5)"
+        
         self.widget_Pz.plotItem.showGrid(y=True)
         self.widget_Pz.setBackground('w')
         self.widget_Pz.setMouseEnabled(x=False)
         self.dock_Pz.addWidget(self.widget_Pz)
 
         self.linha_T8 = self.widget_T8.plot(y=self.canalT8, pen=self.penT8)
-        "self.widget_T8.setYRange(min(self.canalT8) - 100, max(self.canalT8) + 100, padding=0.5)"
+        
         self.widget_T8.plotItem.showGrid(y=True)
         self.widget_T8.setBackground('w')
         self.widget_T8.setMouseEnabled(x=False)
         self.dock_T8.addWidget(self.widget_T8)
 
         self.linha_AF4 = self.widget_AF4.plot(y=self.canalAF4, pen=self.penAF4)
-        "self.widget_AF4.setYRange(min(self.canalAF4) - 100, max(self.canalAF4) + 100, padding=0.5)"
+        
         self.widget_AF4.plotItem.showGrid(y=True)
         self.widget_AF4.setBackground('w')
         self.widget_AF4.setMouseEnabled(x=False)
         self.dock_AF4.addWidget(self.widget_AF4)
+        
+        if self.opc == 2:
+            self.widget_AF3.setYRange(min(self.canalAF3) - 100, max(self.canalAF3) + 100, padding=0.5)
+            self.widget_T7.setYRange(min(self.canalT7) - 100, max(self.canalT7) + 100, padding=0.5)
+            self.widget_Pz.setYRange(min(self.canalPz) - 100, max(self.canalPz) + 100, padding=0.5)
+            self.widget_T8.setYRange(min(self.canalT8) - 100, max(self.canalT8) + 100, padding=0.5)
+            self.widget_AF4.setYRange(min(self.canalAF4) - 100, max(self.canalAF4) + 100, padding=0.5)
         
         self.setCentralWidget(self.area)
         self.resize(1000, 1000)
@@ -94,7 +103,10 @@ class Tela(QtWidgets.QMainWindow):
         self.show()
 
     def read_file(self):
-        with open('TEST2.log', 'r') as f:
+        if ".log" not in self.filename:
+            self.filename += ".log"
+        
+        with open("/logs/" + self.filename, 'r') as f:
 
             data_log = f.readlines()  # Lista com todas as linhas do log
             data_log.pop(0)  # Remove cabeçalho "af3;tz;...;af4"
