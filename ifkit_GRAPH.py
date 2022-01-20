@@ -49,39 +49,39 @@ class Tela(QtWidgets.QMainWindow):
         self.widget_AF4 = pg.PlotWidget()
 
         self.t = []
-        if self.real_time == False:
+        if self.opc == 2:
             self.read_file()
 
         self.linha_AF3 = self.widget_AF3.plot(y=self.canalAF3, pen=self.penAF3)
-        self.widget_AF3.setYRange(min(self.canalAF3) - 100, max(self.canalAF3) + 100, padding=0.5)
+        "self.widget_AF3.setYRange(min(self.canalAF3) - 100, max(self.canalAF3) + 100, padding=0.5)"
         self.widget_AF3.plotItem.showGrid(y=True)
         self.widget_AF3.setBackground('w')
         self.widget_AF3.setMouseEnabled(x=False, y=True)
         self.dock_AF3.addWidget(self.widget_AF3)
 
         self.linha_T7 = self.widget_T7.plot(y=self.canalT7, pen=self.penT7)
-        self.widget_T7.setYRange(min(self.canalT7) - 100, max(self.canalT7) + 100, padding=0.5)
+        "self.widget_T7.setYRange(min(self.canalT7) - 100, max(self.canalT7) + 100, padding=0.5)"
         self.widget_T7.plotItem.showGrid(y=True)
         self.widget_T7.setBackground('w')
         self.widget_T7.setMouseEnabled(x=False)
         self.dock_T7.addWidget(self.widget_T7)
 
         self.linha_Pz = self.widget_Pz.plot(y=self.canalPz, pen=self.penPz)
-        self.widget_Pz.setYRange(min(self.canalPz) - 100, max(self.canalPz) + 100, padding=0.5)
+        "self.widget_Pz.setYRange(min(self.canalPz) - 100, max(self.canalPz) + 100, padding=0.5)"
         self.widget_Pz.plotItem.showGrid(y=True)
         self.widget_Pz.setBackground('w')
         self.widget_Pz.setMouseEnabled(x=False)
         self.dock_Pz.addWidget(self.widget_Pz)
 
         self.linha_T8 = self.widget_T8.plot(y=self.canalT8, pen=self.penT8)
-        self.widget_T8.setYRange(min(self.canalT8) - 100, max(self.canalT8) + 100, padding=0.5)
+        "self.widget_T8.setYRange(min(self.canalT8) - 100, max(self.canalT8) + 100, padding=0.5)"
         self.widget_T8.plotItem.showGrid(y=True)
         self.widget_T8.setBackground('w')
         self.widget_T8.setMouseEnabled(x=False)
         self.dock_T8.addWidget(self.widget_T8)
 
         self.linha_AF4 = self.widget_AF4.plot(y=self.canalAF4, pen=self.penAF4)
-        self.widget_AF4.setYRange(min(self.canalAF4) - 100, max(self.canalAF4) + 100, padding=0.5)
+        "self.widget_AF4.setYRange(min(self.canalAF4) - 100, max(self.canalAF4) + 100, padding=0.5)"
         self.widget_AF4.plotItem.showGrid(y=True)
         self.widget_AF4.setBackground('w')
         self.widget_AF4.setMouseEnabled(x=False)
@@ -114,14 +114,14 @@ class Tela(QtWidgets.QMainWindow):
     def graph_timer(self):
 
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
+        self.timer.setInterval(50)
         self.timer.timeout.connect(self.update_graph)
         self.timer.start()
 
     def update_graph(self):
 
         # Remover primeiro elemento
-        if len(self.canalAF3) > self.range * 5 or self.opc == 2:
+        if len(self.canalAF3) > self.range or self.opc == 2:
             self.canalAF3.pop(0)
             self.canalT7.pop(0)
             self.canalPz.pop(0)

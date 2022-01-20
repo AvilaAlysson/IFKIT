@@ -120,7 +120,7 @@ class EEG_insight(object):
             # Aquisição dos dados de cada canal para plotagem em tempo real
             self.tela.canalAF3.append(float(eeg_data[EEG_name["AF3"]]))
             self.tela.canalT7.append(float(eeg_data[EEG_name["T7"]]))
-            self.tela.canalPZ.append(float(eeg_data[EEG_name["Pz"]]))
+            self.tela.canalPz.append(float(eeg_data[EEG_name["Pz"]]))
             self.tela.canalT8.append(float(eeg_data[EEG_name["T8"]]))
             self.tela.canalAF4.append(float(eeg_data[EEG_name["AF4"]]))
 
