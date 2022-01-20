@@ -138,7 +138,7 @@ class EEG_insight(object):
         if ".log" not in filename:
             filename += ".log"
 
-        with open("/logs/" + filename, "w") as f:
+        with open("logs/" + filename, "w+") as f:
 
             f.write("AF3; T7; Pz; T8; AF4; Tempo\n")
 

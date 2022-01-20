@@ -106,7 +106,7 @@ class Tela(QtWidgets.QMainWindow):
         if ".log" not in self.filename:
             self.filename += ".log"
         
-        with open("/logs/" + self.filename, 'r') as f:
+        with open("logs/" + self.filename, 'r') as f:
 
             data_log = f.readlines()  # Lista com todas as linhas do log
             data_log.pop(0)  # Remove cabeçalho "af3;tz;...;af4"
