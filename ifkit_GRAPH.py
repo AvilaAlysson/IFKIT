@@ -6,17 +6,16 @@ import sys
 
 
 class Tela(QtWidgets.QMainWindow):
-    def __init__(self, filename, *args, **kwargs):
+    
+    def __init__(self, opc, filename, *args, **kwargs):
         
-
         self.app = QtGui.QApplication(sys.argv)
+        
         super(QtWidgets.QMainWindow, self).__init__(*args, **kwargs)
 
-        self.opc = int(input("[1]- Deseja plotar em tempo real \n[2] - Deseja somente ler os dados do arquivo\nOpção: "))
-
         self.range = 1280
-        
         self.filename = filename
+        self.opc = opc
         
         self.area = DockArea()
         self.dock_AF3 = Dock("AF3")
@@ -52,9 +51,11 @@ class Tela(QtWidgets.QMainWindow):
         self.widget_AF4 = pg.PlotWidget()
 
         self.t = []
+        
         if self.opc == 2:
+            
             self.read_file()
-
+        
         self.linha_AF3 = self.widget_AF3.plot(y=self.canalAF3, pen=self.penAF3)
         self.widget_AF3.plotItem.showGrid(y=True)
         self.widget_AF3.setBackground('w')
@@ -89,6 +90,13 @@ class Tela(QtWidgets.QMainWindow):
         self.widget_AF4.setMouseEnabled(x=False)
         self.dock_AF4.addWidget(self.widget_AF4)
         
+        if self.opc == 1:
+            self.widget_AF3.setYRange(3900, 4600, padding=0.5)
+            self.widget_T7.setYRange(3900, 4600, padding=0.5)
+            self.widget_Pz.setYRange(4000, 4300, padding=0.5)
+            self.widget_T8.setYRange(3900, 4400, padding=0.5)
+            self.widget_AF4.setYRange(3900, 4600, padding=0.5)
+        
         if self.opc == 2:
             self.widget_AF3.setYRange(min(self.canalAF3) - 100, max(self.canalAF3) + 100, padding=0.5)
             self.widget_T7.setYRange(min(self.canalT7) - 100, max(self.canalT7) + 100, padding=0.5)
@@ -98,17 +106,19 @@ class Tela(QtWidgets.QMainWindow):
         
         self.setCentralWidget(self.area)
         self.resize(1000, 1000)
-        self.setWindowTitle('EEG')
+        self.setWindowTitle('EEG bruto')
         self.graph_timer()
         self.show()
-
+     
     def read_file(self):
-        if ".log" not in self.filename:
-            self.filename += ".log"
         
-        with open("logs/" + self.filename, 'r') as f:
+        if ".csv" not in self.filename:
+            
+            self.filename += ".csv"
+        
+        with open("csv/" + self.filename, 'r') as f:
 
-            data_log = f.readlines()  # Lista com todas as linhas do log
+            data_log = f.readlines()  # Lista com todas as linhas do csv
             data_log.pop(0)  # Remove cabeçalho "af3;tz;...;af4"
 
             for linha in data_log:
@@ -126,7 +136,7 @@ class Tela(QtWidgets.QMainWindow):
     def graph_timer(self):
 
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(50)
+        self.timer.setInterval(3)
         self.timer.timeout.connect(self.update_graph)
         self.timer.start()
 
@@ -134,6 +144,7 @@ class Tela(QtWidgets.QMainWindow):
 
         # Remover primeiro elemento
         if len(self.canalAF3) > self.range or self.opc == 2:
+            
             self.canalAF3.pop(0)
             self.canalT7.pop(0)
             self.canalPz.pop(0)
@@ -147,9 +158,15 @@ class Tela(QtWidgets.QMainWindow):
         self.linha_T8.setData(self.canalT8[0:self.range])
         self.linha_AF4.setData(self.canalAF4[0:self.range])
 
-    def execute(self):
+    def execute_graph(self):
 
         sys.exit(self.app.exec_())
-
+        
+    def close_graph(self):
+        
+        self.app.closeAllWindows()
+        
+        print('\nPlotagem encerrada')
+        
 
 
