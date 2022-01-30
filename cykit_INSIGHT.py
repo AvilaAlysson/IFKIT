@@ -37,7 +37,7 @@ class EEG_insight(object):
         self.tempo = []
         self.start = 0
         self.tela = None
-        
+          
         self.interface_eeg()
         
         signal.signal(signal.SIGINT, self.signal_handler)
@@ -77,11 +77,11 @@ class EEG_insight(object):
         
         if self.opc == 1:
             
-            self.save = str(input("\nVocê deseja salvar os dados em um arquivo .csv [S/N]? "))
+            self.save = str(input("\033[1;32mVocê deseja salvar os dados em um arquivo .csv [S/N]?\033[m "))
             
             if self.save == 'S':
                 
-                self.filename = str(input('\nInforme o nome do arquivo: '))
+                self.filename = str(input('\033[1;32mInforme o nome do arquivo:\033[m '))
             
             elif self.save == 'N':
                 
@@ -89,17 +89,16 @@ class EEG_insight(object):
         
         elif self.opc == 2:
             
-            self.filename = str(input('\n\033[1;32mInforme o nome do arquivo a ser lido:\033[m '))
-            pass
-        
+            self.filename = str(input('\033[1;32mInforme o nome do arquivo a ser lido:\033[m '))
+            
         elif self.opc == 3:
             
-            self.timing = float(input("\nInforme a duração da gravação: "))
-            self.save = str(input("\nVocê deseja salvar os dados em um arquivo .csv [S/N]? "))
+            self.timing = int(input("\033[1;32mInforme a duração da gravação (segundos):\033[m "))
+            self.save = str(input("\033[1;32mVocê deseja salvar os dados em um arquivo .csv [S/N]?\033[m "))            
             
             if self.save == 'S':
                 
-                self.filename = str(input('\nInforme o nome do arquivo: '))
+                self.filename = str(input('\033[1;32mInforme o nome do arquivo:\033[m '))
             
             elif self.save == 'N':
                 
@@ -118,25 +117,50 @@ class EEG_insight(object):
         Início; Duração; Fim. 
         Além de gravar os dados adquiridos no arquivo .csv bem como fechar o gráfico.
         """
-
-        if self.opc == 1 or self.opc == 3:
-            
-            #Duração da execução do programa;
-            self.dur = time.time() - self.start
+        self.tela.close_graph()
+        
+        if self.opc == 1:
             
             #Marcação do fim do programa
-            self.end = datetime.now()
+            self.end = time.time()
             
-            print(f'\nInicío: {self.start}'
-                f'\nDuração: {self.dur}'
-                f'\nFim: {self.end}')
+            #Duração da execução do programa;
+            self.dur = self.end - self.start
+            
+            #Formatação da string do tempo de início
+            self.s = time.gmtime(self.start)
+            self.s = time.strftime("%d/%m/%Y %H:%M:%S", self.s)
+            
+            #Formatação da string do tempo de encerramento
+            self.e = time.gmtime(self.end)
+            self.e = time.strftime("%d/%m/%Y %H:%M:%S", self.e)
+            
+            
+            print(f'\n\033[1;32mInicío:\033[m {self.s}'
+                f'\n\033[1;32mDuração:\033[m {self.dur:.2f} segundos'
+                f'\n\033[1;32mFim:\033[m {self.e}')
+
         
         if self.opc == 1 and self.save == 'S':
             
             self.gen_file(self.filename, self.save)
-
-        self.tela.close_graph()
+            
+        elif self.opc == 1 and self.save == 'N':
+            
+            print("\nArquivo não salvo")
         
+        elif self.opc == 2:
+            
+            print("\nArquivo lido com sucesso.")
+        
+        elif self.opc == 3:
+            
+            print('\nPlotagem interrompida...')
+
+        print("\n\033[7;32mPROGRAMA ENCERRADO\n\033[m")
+        #self.do_fft()
+        
+            
     def dataHandler(self, data):
 
         """
@@ -147,7 +171,7 @@ class EEG_insight(object):
         if self.cipher == None:
             
             return
-        
+        1
         join_data = ''.join(map(chr, data[1:]))
         data = self.cipher.decrypt(bytes(join_data, 'latin-1')[0:32])
         tasks.put(data)
@@ -202,7 +226,7 @@ class EEG_insight(object):
             
             self.start = time.time()
             
-            print('\nCAPTURANDO DADOS')
+            print('\nCapturando os dados...')
         
             while 1:
 
@@ -214,6 +238,7 @@ class EEG_insight(object):
                 self.tela.canalPz.append(float(eeg_data[EEG_name["Pz"]]))
                 self.tela.canalT8.append(float(eeg_data[EEG_name["T8"]]))
                 self.tela.canalAF4.append(float(eeg_data[EEG_name["AF4"]]))
+                
 
                 # Aquisição dos dados de cada canal para salvar no arquivo .csv
                 self.canal_AF3.append(str(eeg_data[EEG_name["AF3"]]))
@@ -224,6 +249,31 @@ class EEG_insight(object):
                 
                 # Lista com instantes de aquisição de cada dado - Exemplo: '2021-10-13 10:53:48.813976'
                 self.data.append(datetime.now())
+                                      
+    def do_fft(self):
+        
+        """
+        Calcula a FFT para cada canal
+        Entrada: lista composta com os dados de cada canal canais
+        """
+        
+        self.fft_AF3 = list(map(lambda x: abs(np.fft.fft(x)), self.canal_AF3))
+        self.fft_T7 = list(map(lambda x: abs(np.fft.fft(x)), self.canal_T7))
+        self.fft_Pz = list(map(lambda x: abs(np.fft.fft(x)), self.canal_Pz))
+        self.fft_T8 = list(map(lambda x: abs(np.fft.fft(x)), self.canal_T8))
+        self.fft_AF4 = list(map(lambda x: abs(np.fft.fft(x)), self.canal_AF4))
+        
+        
+        print(self.fft_AF4)
+
+    
+    def get_fft(self, all_channel_data):
+        
+        #Taxa de amostragem em Hertz (128 amostras por segundo)
+        Fs = 128 
+        
+        #Comprimento do sinal  ou número total de amostras
+        L = len(all_channel_data[0])
 
     def gen_file(self, filename, save):
         
@@ -236,11 +286,13 @@ class EEG_insight(object):
             
             if ".csv" not in filename:
                 print('\nInserindo .csv no nome do arquivo...')
+                time.sleep(1)
                 filename += ".csv"
+            
 
             with open("csv/" + filename, "w+") as f:
 
-                f.write(f"AF3; T7; Pz; T8; AF4; Tempo; Início: {self.start};Fim: {self.end}; Duração: {self.end}\n")
+                f.write(f"AF3; T7; Pz; T8; AF4; Tempo; Início: {self.s};Fim: {self.e}; Duração: {self.dur}\n")
 
                 for c in range(len(self.canal_AF3)):
 
@@ -251,33 +303,15 @@ class EEG_insight(object):
                         
                     f.write(linha)
                     
-            print('Arquivo gerado')
-            
-                    
+            print('\nArquivo gerado.')
+        
         elif self.save == 'N':
-            print("\nArquivo não salvo")
-            pass
-    
-    def do_fft(self, all_channel_data):
-        
-        """
-        Calcula a FFT para cada canal
-        Entrada: lista composta com os dados de cada canal canais
-        """
-        
-        data_fft = map(lambda x: abs(np.fft.fft(x)), all_channel_data)
-
-        return data_fft
-    
-    def get_fft(self, all_channel_data):
-        
-        #Taxa de amostragem em Hertz (128 amostras por segundo)
-        Fs = 128 
-        
-        #Comprimento do sinal  ou número total de amostras
-        L = len(all_channel_data[0])
-        
-
+            
+            print('\nArquivo não foi gerado.')
+            
+            
+            
+            
 if os.name == 'nt':
     os.system("mode con:cols=80 lines=14")  # Resize screen (for Windows)
 
@@ -291,17 +325,13 @@ init = True
 while 1:
 
     if init == True:
-        
-        if cyHeadset.opc == 1 or cyHeadset.opc == 3:
             
-            cyHeadset.tela = Tela(opc=cyHeadset.opc, filename=cyHeadset.filename)
-            data_thread.start()
-            cyHeadset.tela.execute_graph()
-            init = False
-        
-        elif cyHeadset.opc == 2:
+            cyHeadset.tela = Tela(opc=cyHeadset.opc, filename=cyHeadset.filename, timing=cyHeadset.timing)
             
-            cyHeadset.tela = Tela(opc=cyHeadset.opc, filename=cyHeadset.filename)
+            if cyHeadset.opc == 1 or cyHeadset.opc == 3:
+                
+                data_thread.start()
+
             cyHeadset.tela.execute_graph()
             init = False
 
@@ -310,4 +340,3 @@ while 1:
     while tasks.empty():
         time.sleep(0)
         pass
-
